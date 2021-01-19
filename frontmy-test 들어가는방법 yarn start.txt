@@ -1,0 +1,85 @@
+import React, {Component} from "react";
+import axios from "axios";
+import ReservedAreaComponent from "./ReservedAreaComponent";
+import host_url from "../config/Config";
+
+
+class DashboardMainComponent extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            serverStatus: '',
+            reservedArea: []
+
+        }
+    }
+
+    componentDidMount() {
+        this.getApi();
+    }
+
+    getApi = () => {
+        axios.get(host_url + "/dashboard/serverStatus")
+            .then(res => {
+                this.setState({
+                    serverStatus: res.data
+                });
+            })
+            .catch(res => console.log(res))
+
+        axios.get(host_url + "/dashboard/reservedArea")
+            .then(res => {
+                const data = res.data.slice(0)
+                this.setState({
+                    reservedArea: data
+                });
+            })
+            .catch(res => console.log(res))
+
+        // setTimeout(() => {
+        //     axios.get("http://localhost:8081/sq/home/default")
+        //         .then(res => {
+        //             console.log(res);
+        //             // console.log(res.data)
+        //             this.setState({
+        //                 message: res.data.message
+        //             })
+        //         })
+        //         .catch(res => console.log(res))
+        // }, 3000)
+
+    }
+
+    render() {
+        return(
+            <div>
+                <br />
+                <div className="list-group">
+                    서버 상태
+                    <br />
+                    <div className="list-group-item">
+                        Status: {this.state.serverStatus.status}
+                        Message: {this.state.serverStatus.message}
+                    </div>
+                </div>
+                <br />
+                <div className="list-group">
+                    Reserved Area
+                    <br />
+                    <div className="list-group-item">
+                        {this.state.reservedArea.map(({id, owner, tableName}) => (
+                        <ReservedAreaComponent
+                            id={id}
+                            owner={owner}
+                            tableName={tableName}
+                        />
+                        ))}
+                    </div>
+                </div>
+            </div>
+        )
+    }
+}
+
+
+export default DashboardMainComponent
